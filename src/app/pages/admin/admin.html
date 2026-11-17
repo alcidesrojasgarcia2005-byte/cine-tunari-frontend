@@ -1,0 +1,97 @@
+<section class="admin page container">
+  <header class="admin__head reveal">
+    <div>
+      <span class="eyebrow">{{ content.sitio()?.nombre }}</span>
+      <h1><app-accent-title [texto]="content.seccion('admin').titulo || 'Administración del catálogo'" /></h1>
+      <p class="muted">{{ content.seccion('admin').subtitulo }}</p>
+    </div>
+    <button type="button" class="btn btn--primary" (click)="abrir('nuevo')">+ Nuevo título</button>
+  </header>
+
+  @if (aviso()) {
+    <p class="alert alert--ok" role="status">{{ aviso() }}</p>
+  }
+  @if (error()) {
+    <p class="alert alert--error" role="alert">{{ error() }}</p>
+  }
+
+  <div class="admin__layout" [class.admin__layout--open]="seleccion() !== null">
+    <!-- ===== Lista de títulos ===== -->
+    <div class="admin__list reveal" style="--i: 1">
+      <div class="admin__filters">
+        <input class="input" type="search" placeholder="Filtrar por nombre" aria-label="Filtrar por nombre" [value]="filtroTexto()" (input)="filtroTexto.set($any($event.target).value)" />
+        <select class="input" aria-label="Categoría" [value]="filtroCategoria()" (change)="filtroCategoria.set($any($event.target).value)">
+          <option value="">Todas las categorías</option>
+          @for (c of content.categorias(); track c.id) {
+            <option [value]="c.slug">{{ c.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <p class="admin__count muted">
+        {{ visibles().length }} de {{ titulos().length }} títulos
+        @if (pendientes() > 0) { · <span class="admin__warn">{{ pendientes() }} sin video</span> }
+      </p>
+
+      @if (loading()) {
+        @for (i of esqueletos; track i) {
+          <span class="skeleton admin__sk"></span>
+        }
+      } @else if (visibles().length === 0) {
+        <div class="empty">
+          <span class="empty__mark">∅</span>
+          <h3>{{ content.seccion('vacio').titulo }}</h3>
+        </div>
+      } @else {
+        <ul class="items">
+          @for (t of visibles(); track t.id) {
+            <li class="item" [class.item--on]="editandoId() === t.id">
+              <button type="button" class="item__main" (click)="abrir(t.id)">
+                <span class="item__thumb">
+                  @if (portada(t)) {
+                    <img [src]="portada(t)" alt="" loading="lazy" />
+                  } @else {
+                    {{ marca(t) }}
+                  }
+                </span>
+                <span class="item__text">
+                  <span class="item__name">{{ t.titulo }}</span>
+                  <span class="item__meta">
+                    {{ t.categoria }}@if (t.anio) { · {{ t.anio }} }
+                    @if (!tieneVideo(t)) { · <span class="admin__warn">sin video</span> }
+                  </span>
+                </span>
+              </button>
+              <div class="item__actions">
+                <button
+                  type="button"
+                  class="item__star"
+                  [class.item__star--on]="t.destacado"
+                  [attr.aria-pressed]="t.destacado"
+                  [attr.aria-label]="t.destacado ? 'Quitar de destacados' : 'Marcar como destacado'"
+                  [title]="t.destacado ? 'Destacado (clic para quitar)' : 'Marcar como destacado'"
+                  (click)="alternarDestacado(t)"
+                >★</button>
+                <a class="item__icon" [routerLink]="['/titulo', t.id]" title="Ver en el sitio" aria-label="Ver en el sitio">↗</a>
+                <button type="button" class="item__icon item__icon--danger" title="Eliminar" [attr.aria-label]="'Eliminar ' + t.titulo" (click)="eliminar(t)">✕</button>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <!-- ===== Editor ===== -->
+    @if (seleccion() !== null) {
+      <div class="admin__editor" id="editor">
+        <app-title-form [tituloId]="editandoId()" (guardado)="onGuardado($event)" (cancelar)="cerrar()" />
+
+        @if (editandoId(); as id) {
+          @if (conEpisodios()) {
+            <app-episodes-editor [tituloId]="id" />
+          }
+        }
+      </div>
+    }
+  </div>
+</section>

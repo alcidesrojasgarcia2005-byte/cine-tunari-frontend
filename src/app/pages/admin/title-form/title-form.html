@@ -1,0 +1,135 @@
+<form class="admin-card" [formGroup]="form" (ngSubmit)="guardar()" novalidate [attr.aria-busy]="cargando()">
+  <header class="admin-card__head">
+    <h2>{{ tituloId() === null ? 'Nuevo título' : 'Editar título' }}</h2>
+    <button type="button" class="link" (click)="cancelar.emit()">Cerrar ✕</button>
+  </header>
+
+  @if (cargando()) {
+    <span class="skeleton" style="height: 320px"></span>
+  } @else {
+    <div class="form-grid">
+      <label class="field form-grid__full">
+        <span>Título *</span>
+        <input class="input" formControlName="titulo" maxlength="200" />
+        @if (invalido('titulo')) {
+          <p class="form-error">El título es obligatorio.</p>
+        }
+      </label>
+
+      <label class="field form-grid__full">
+        <span>Sinopsis *</span>
+        <textarea class="input" formControlName="sinopsis" rows="4"></textarea>
+        @if (invalido('sinopsis')) {
+          <p class="form-error">La sinopsis es obligatoria.</p>
+        }
+      </label>
+
+      <label class="field">
+        <span>Categoría *</span>
+        <select class="input" formControlName="categoria_id">
+          @for (c of content.categorias(); track c.id) {
+            <option [ngValue]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Clasificación</span>
+        <select class="input" formControlName="clasificacion">
+          @for (c of clasificaciones; track c) {
+            <option [value]="c">{{ c || '—' }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Año</span>
+        <input class="input" type="number" formControlName="anio" min="1895" max="2100" />
+      </label>
+
+      <label class="field">
+        <span>Duración (min)</span>
+        <input class="input" type="number" formControlName="duracion_min" min="1" max="1000" />
+      </label>
+
+      <label class="field">
+        <span>Director/a</span>
+        <input class="input" formControlName="director" maxlength="150" />
+      </label>
+
+      <label class="field">
+        <span>País</span>
+        <input class="input" formControlName="pais" maxlength="80" />
+      </label>
+
+      <fieldset class="field form-grid__full genres">
+        <legend>Géneros</legend>
+        <div class="genres__list">
+          @for (g of content.generos(); track g.id) {
+            <label class="check genres__item" [class.genres__item--on]="generos().has(g.id)">
+              <input type="checkbox" [checked]="generos().has(g.id)" (change)="alternarGenero(g.id)" />
+              {{ g.nombre }}
+            </label>
+          }
+        </div>
+      </fieldset>
+
+      <h3 class="form-grid__full form-grid__section">Archivos</h3>
+
+      <label class="field">
+        <span>Portada (2:3)</span>
+        <input class="input" formControlName="portada" placeholder="mi-pelicula.jpg" />
+        <small>Archivo en public/portadas/ o URL https://</small>
+      </label>
+      <div class="preview preview--poster" aria-hidden="true">
+        @if (portadaUrl()) {
+          <img [src]="portadaUrl()" alt="" />
+        }
+      </div>
+
+      <label class="field">
+        <span>Banner (16:9)</span>
+        <input class="input" formControlName="banner" placeholder="mi-pelicula-banner.jpg" />
+        <small>Archivo en public/portadas/ o URL https://</small>
+      </label>
+      <div class="preview preview--banner" aria-hidden="true">
+        @if (bannerUrl()) {
+          <img [src]="bannerUrl()" alt="" />
+        }
+      </div>
+
+      <label class="field form-grid__full">
+        <span>Video</span>
+        <input class="input" formControlName="video_url" placeholder="mi-pelicula.mp4" />
+        @if (conEpisodios()) {
+          <small>En series y novelas el video se carga en cada episodio (abajo).</small>
+        } @else if (videoUrl()) {
+          <small>Se reproducirá desde: <a class="link" [href]="videoUrl()" target="_blank" rel="noopener">{{ videoUrl() }}</a></small>
+        } @else {
+          <small>Archivo en public/videos/ o URL https://. Vacío = “contenido no disponible aún”.</small>
+        }
+      </label>
+
+      <label class="field form-grid__full">
+        <span>Tráiler</span>
+        <input class="input" formControlName="trailer_url" placeholder="mi-pelicula-trailer.mp4" />
+      </label>
+
+      <label class="check form-grid__full">
+        <input type="checkbox" formControlName="destacado" />
+        Destacado (aparece en la portada del inicio)
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="alert alert--error" role="alert">{{ error() }}</p>
+    }
+
+    <footer class="admin-card__foot">
+      <button type="button" class="btn" (click)="cancelar.emit()">Cancelar</button>
+      <button type="submit" class="btn btn--primary" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : tituloId() === null ? 'Crear título' : 'Guardar cambios' }}
+      </button>
+    </footer>
+  }
+</form>

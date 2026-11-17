@@ -1,0 +1,46 @@
+.auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--header-h) + 2rem) var(--gutter) 3rem;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, var(--accent-faint), transparent 70%),
+    var(--bg);
+
+  &__card {
+    width: 100%;
+    max-width: 420px;
+    padding: clamp(1.75rem, 5vw, 2.75rem);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+  }
+
+  h1 {
+    font-size: var(--fs-h1);
+    margin: 0.5rem 0 0.25rem;
+  }
+
+  &__subtitle {
+    margin: 0 0 2rem;
+    color: var(--muted);
+  }
+
+  form {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  &__foot {
+    margin: 1.75rem 0 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+}

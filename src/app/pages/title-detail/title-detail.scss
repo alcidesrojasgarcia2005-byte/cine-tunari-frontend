@@ -1,0 +1,226 @@
+.detail {
+  padding-bottom: 3rem;
+
+  /* Banner a sangre completa con fundido hacia el fondo */
+  &__banner {
+    position: relative;
+    height: min(62vh, 620px);
+    background: var(--grad-placeholder) center / cover no-repeat;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        var(--grad-fade-bottom),
+        linear-gradient(90deg, var(--veil) 0%, transparent 60%);
+    }
+
+    &--empty {
+      height: min(40vh, 380px);
+    }
+  }
+
+  &__body {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(200px, 280px) 1fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    margin-top: -12rem;
+  }
+
+  &__poster {
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--grad-placeholder);
+    box-shadow:
+      inset 0 0 0 1px var(--accent-faint),
+      var(--shadow);
+    display: grid;
+    place-items: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__sk-poster {
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius);
+  }
+
+  &__initials {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 3.5rem;
+    color: var(--accent);
+  }
+
+  &__main {
+    padding-top: 8rem;
+
+    h1 {
+      font-size: var(--fs-h1);
+      margin: 0.4rem 0 1rem;
+    }
+  }
+
+  &__synopsis {
+    max-width: 68ch;
+    margin: 0;
+    color: var(--text);
+    opacity: 0.88;
+    font-size: 1.05rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 2rem;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+  }
+}
+
+.sheet {
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 0.9rem;
+
+  div {
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  dt {
+    font-size: var(--fs-tiny);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  dd {
+    margin: 0.2rem 0 0;
+  }
+}
+
+.rating {
+  padding: 0 0.45rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Episodios ---------- */
+.episodes {
+  margin-top: 3rem;
+
+  h2 {
+    font-size: var(--fs-h2);
+    margin: 0 0 1rem;
+  }
+
+  &__season {
+    font-size: 1rem;
+    color: var(--muted);
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+.episode {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.1rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  transition:
+    background var(--dur) var(--ease),
+    padding var(--dur) var(--ease);
+
+  &:hover {
+    background: var(--bg-elevated);
+    padding-left: 1.1rem;
+
+    .episode__num {
+      color: var(--accent);
+    }
+  }
+
+  &--current {
+    box-shadow: inset 2px 0 0 var(--accent);
+  }
+
+  &__num {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    color: var(--faint);
+    transition: color var(--dur) var(--ease);
+  }
+
+  &__body {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  &__name {
+    font-weight: 400;
+  }
+
+  &__synopsis {
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  &__meta {
+    display: grid;
+    justify-items: end;
+    gap: 0.25rem;
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  &__soon {
+    font-size: var(--fs-tiny);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+}
+
+@media (max-width: 760px) {
+  .detail__body {
+    grid-template-columns: 1fr;
+    margin-top: -6rem;
+  }
+
+  .detail__aside {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .sheet {
+    margin: 0;
+  }
+
+  .detail__main {
+    padding-top: 0;
+  }
+}

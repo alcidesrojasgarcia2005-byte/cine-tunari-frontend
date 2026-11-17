@@ -1,0 +1,75 @@
+<section class="player" [attr.aria-busy]="loading()">
+  <header class="player__bar">
+    <a class="player__back" [routerLink]="item() ? ['/titulo', item()!.id] : ['/']" aria-label="Volver">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
+    </a>
+
+    @if (item(); as it) {
+      <div class="player__title">
+        <strong>{{ it.titulo }}</strong>
+        @if (episodio(); as ep) {
+          <span>T{{ ep.temporada }} · E{{ ep.numero }} — {{ ep.nombre }}</span>
+        }
+      </div>
+
+      @if (episodios().length > 1) {
+        <div class="player__eps">
+          <label class="sr-only" for="episodio">{{ content.seccion('episodios').titulo }}</label>
+          <select id="episodio" [value]="episodio()?.id" (change)="elegirEpisodio($any($event.target).value)">
+            @for (ep of episodios(); track ep.id) {
+              <option [value]="ep.id">T{{ ep.temporada }} · E{{ ep.numero }} — {{ ep.nombre }}</option>
+            }
+          </select>
+          @if (siguiente(); as sig) {
+            <button type="button" class="btn btn--sm" (click)="elegirEpisodio(sig.id)">Siguiente ›</button>
+          }
+        </div>
+      }
+    }
+  </header>
+
+  <div class="player__stage">
+    @if (loading()) {
+      <span class="skeleton player__sk"></span>
+    } @else if (error()) {
+      <div class="notice">
+        <p class="notice__mark">!</p>
+        <h1>{{ error() }}</h1>
+        <a class="btn" routerLink="/">← {{ content.seccion('inicio').etiqueta }}</a>
+      </div>
+    } @else if (videoSrc() && !videoError()) {
+      <!--
+        preload="metadata": solo descarga la cabecera; el resto se pide por rangos (HTTP 206)
+        a medida que se reproduce o se adelanta. Ideal para videos de 30 min a 2 h.
+      -->
+      <video
+        #player
+        class="player__video"
+        controls
+        autoplay
+        playsinline
+        preload="metadata"
+        [poster]="poster() || null"
+        [src]="videoSrc()"
+        (loadedmetadata)="onLoaded(player)"
+        (timeupdate)="onTime(player)"
+        (pause)="onPause(player)"
+        (error)="onVideoError()"
+      ></video>
+    } @else if (item(); as it) {
+      <div class="notice notice--poster" [style.background-image]="posterCss()">
+        <div class="notice__card">
+          <p class="eyebrow">{{ it.titulo }}</p>
+          <h1><em>{{ content.seccion('no_disponible').titulo }}</em></h1>
+          <p class="muted">{{ content.seccion('no_disponible').subtitulo }}</p>
+          <div class="notice__actions">
+            <a class="btn btn--primary" [routerLink]="['/titulo', it.id]">← Volver</a>
+            @if (siguiente(); as sig) {
+              <button type="button" class="btn" (click)="elegirEpisodio(sig.id)">Siguiente episodio ›</button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

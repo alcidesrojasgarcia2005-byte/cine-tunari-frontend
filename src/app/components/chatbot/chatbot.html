@@ -1,0 +1,54 @@
+@if (abierto()) {
+  <section class="panel" role="dialog" [attr.aria-label]="content.seccion('chatbot').titulo">
+    <header class="panel__head">
+      <div>
+        <h2>{{ content.seccion('chatbot').titulo }}</h2>
+        <p>{{ content.sitio()?.nombre }}</p>
+      </div>
+      <button type="button" class="panel__close" (click)="alternar()" aria-label="Cerrar">✕</button>
+    </header>
+
+    <div class="panel__messages" #lista aria-live="polite">
+      @if (content.seccion('chatbot').subtitulo) {
+        <p class="msg msg--bot">{{ content.seccion('chatbot').subtitulo }}</p>
+      }
+      @for (m of mensajes(); track m.id) {
+        <p class="msg" [class.msg--user]="m.rol === 'usuario'" [class.msg--bot]="m.rol === 'bot'" [class.msg--error]="m.rol === 'error'">
+          {{ m.texto }}
+        </p>
+      }
+      @if (escribiendo()) {
+        <p class="msg msg--bot msg--typing">escribiendo<span>.</span><span>.</span><span>.</span></p>
+      }
+    </div>
+
+    <form class="panel__form" (submit)="$event.preventDefault(); enviar()">
+      <textarea
+        #entrada
+        rows="2"
+        [value]="texto()"
+        (input)="texto.set($any($event.target).value)"
+        (keydown)="onTecla($event)"
+        [attr.maxlength]="maximo"
+        aria-label="Escribe tu pregunta"
+        placeholder="Escribe tu pregunta..."
+      ></textarea>
+      <button type="submit" [disabled]="!puedeEnviar()" aria-label="Enviar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5 21 12 3 3.5l2.5 7.2L14 12l-8.5 1.3z" /></svg></button>
+    </form>
+  </section>
+}
+
+<button
+  type="button"
+  class="fab"
+  (click)="alternar()"
+  [attr.aria-expanded]="abierto()"
+  [attr.aria-label]="content.seccion('chatbot').etiqueta"
+  [title]="content.seccion('chatbot').etiqueta"
+>
+  @if (abierto()) {
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  } @else {
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" /><path d="M8 9.5h8M8 12.5h5" /></svg>
+  }
+</button>

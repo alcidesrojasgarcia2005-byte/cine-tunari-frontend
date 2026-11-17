@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
+import { AccentTitle } from './components/accent-title/accent-title';
+import { Chatbot } from './components/chatbot/chatbot';
+import { Header } from './components/header/header';
+import { Content } from './core/services/content';
+
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
+  imports: [RouterOutlet, Header, Chatbot, AccentTitle],
   templateUrl: './app.html',
+  styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('cine-tunari');
+  readonly content = inject(Content);
 }

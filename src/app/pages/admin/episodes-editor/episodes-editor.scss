@@ -1,0 +1,53 @@
+.eps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 6rem 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.7rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    transition: background var(--dur) var(--ease);
+
+    &:hover {
+      background: var(--bg-raised);
+    }
+
+    &--on {
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+  }
+
+  &__num {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  &__name {
+    min-width: 0;
+  }
+
+  &__warn {
+    margin-left: 0.4rem;
+    color: var(--accent);
+    font-size: var(--fs-tiny);
+  }
+
+  &__del:hover {
+    color: var(--danger);
+  }
+
+  &__form {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-strong);
+
+    h3 {
+      margin: 0 0 1rem;
+      font-size: 1.1rem;
+    }
+  }
+}

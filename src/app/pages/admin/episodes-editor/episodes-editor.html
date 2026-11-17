@@ -1,0 +1,77 @@
+<section class="admin-card">
+  <header class="admin-card__head">
+    <h2>{{ content.seccion('episodios').titulo || 'Episodios' }} <span class="muted">({{ episodios().length }})</span></h2>
+    <button type="button" class="btn btn--sm" (click)="nuevo()">+ Agregar episodio</button>
+  </header>
+
+  @if (error()) {
+    <p class="alert alert--error" role="alert">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <span class="skeleton" style="height: 120px"></span>
+  } @else {
+    @if (episodios().length === 0 && editando() === null) {
+      <div class="empty">
+        <span class="empty__mark">0</span>
+        <p>Todavía no hay episodios. Agrega el primero.</p>
+      </div>
+    }
+
+    <ol class="eps">
+      @for (ep of episodios(); track ep.id) {
+        <li class="eps__row" [class.eps__row--on]="editando() === ep.id">
+          <span class="eps__num">T{{ ep.temporada }} · E{{ ep.numero }}</span>
+          <span class="eps__name">
+            {{ ep.nombre }}
+            @if (!ep.video_url) {
+              <small class="eps__warn">sin video</small>
+            }
+          </span>
+          <button type="button" class="link" (click)="editar(ep)">Editar</button>
+          <button type="button" class="link eps__del" (click)="eliminar(ep)" [attr.aria-label]="'Eliminar ' + ep.nombre">Eliminar</button>
+        </li>
+      }
+    </ol>
+
+    @if (editando() !== null) {
+      <form class="eps__form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <h3>{{ editando() === 'nuevo' ? 'Nuevo episodio' : 'Editar episodio' }}</h3>
+        <div class="form-grid form-grid--3">
+          <label class="field">
+            <span>Temporada *</span>
+            <input class="input" type="number" min="1" formControlName="temporada" />
+          </label>
+          <label class="field">
+            <span>Número *</span>
+            <input class="input" type="number" min="1" formControlName="numero" />
+          </label>
+          <label class="field">
+            <span>Duración (min)</span>
+            <input class="input" type="number" min="1" formControlName="duracion_min" />
+          </label>
+          <label class="field form-grid__full">
+            <span>Nombre *</span>
+            <input class="input" formControlName="nombre" maxlength="200" />
+            @if (invalido('nombre')) {
+              <p class="form-error">El nombre es obligatorio.</p>
+            }
+          </label>
+          <label class="field form-grid__full">
+            <span>Sinopsis</span>
+            <textarea class="input" rows="2" formControlName="sinopsis"></textarea>
+          </label>
+          <label class="field form-grid__full">
+            <span>Video</span>
+            <input class="input" formControlName="video_url" placeholder="mi-serie-t1-e1.mp4" />
+            <small>Archivo en public/videos/ o URL https://</small>
+          </label>
+        </div>
+        <footer class="admin-card__foot">
+          <button type="button" class="btn" (click)="editando.set(null)">Cancelar</button>
+          <button type="submit" class="btn btn--primary" [disabled]="guardando()">{{ guardando() ? 'Guardando...' : 'Guardar episodio' }}</button>
+        </footer>
+      </form>
+    }
+  }
+</section>

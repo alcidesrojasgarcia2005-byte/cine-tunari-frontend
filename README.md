@@ -1,59 +1,112 @@
-# CineTunari
+# Cine Tunari — Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Capa de **presentación** de Cine Tunari, una plataforma de streaming gratuita de películas,
+series, novelas y documentales bolivianos y latinoamericanos.
+Proyecto Procesual de la materia *Programación Gráfica y Multimedia*.
 
-## Development server
+Consume la API REST del repositorio **`cine-tunari-backend`** (Node + Express + MySQL + Ollama).
+La explicación de las 3 capas está en `cine-tunari-backend/ARQUITECTURA.md`.
 
-To start a local development server, run:
+## Funcionalidades
 
-```bash
-ng serve
+- Catálogo con portada destacada, filas por categoría, buscador y filtros por categoría y género.
+- "Continuar viendo" y "Mi lista" (favoritos) para usuarios con sesión.
+- Ficha y reproductor `<video controls>` con búsqueda por tiempo, pensado para videos de 30 min a
+  2 h (descarga por rangos), retoma desde el último segundo visto y lista de episodios para series
+  y novelas. Si un título no tiene video, muestra "Contenido no disponible aún".
+- Registro e inicio de sesión.
+- Chatbot flotante (esquina inferior derecha) que responde solo sobre la plataforma.
+- Todos los títulos de sección, el nombre del sitio y el eslogan vienen de las tablas `secciones`
+  y `sitio` de la base de datos.
+
+## Administración del catálogo (`/admin`)
+
+1. Inicia sesión (usuario de prueba `demo@cinetunari.demo` / `demo1234`).
+2. En el menú aparece **Administrar** (o entra a `http://localhost:4200/admin`).
+3. Desde ahí puedes, sin escribir SQL:
+   - ver todos los títulos, filtrarlos por nombre o categoría y ver cuáles no tienen video;
+   - crear, editar y eliminar títulos con todos sus campos (portada, banner y video aceptan el
+     nombre del archivo copiado en `cine-tunari-backend/public/...` o una URL);
+   - marcar o desmarcar un título como destacado con la estrella ★;
+   - en series y novelas, agregar, editar y eliminar episodios.
+
+## Diseño
+
+Estética de sala de cine: fondo casi negro cálido, un único acento dorado envejecido,
+Playfair Display para títulos (la última palabra en cursiva dorada) e Inter para el texto.
+Todos los colores, tamaños y tiempos son variables CSS en `src/styles.scss`.
+
+## Tecnología
+
+- Angular 22: componentes standalone, señales (`signal`, `computed`) y control de flujo `@if` / `@for`.
+- `HttpClient` centralizado en un único servicio: `src/app/core/services/api.ts`.
+- SCSS con variables CSS globales (tema oscuro).
+
+## Requisitos
+
+- Node.js 20 o superior y npm
+- Angular CLI (`npm install -g @angular/cli`)
+- El backend `cine-tunari-backend` funcionando en `http://127.0.0.1:3000`
+
+## Instalación paso a paso
+
+1. Levanta primero el backend (ver su README): XAMPP con MySQL, base importada, Ollama y `npm start`.
+2. Instala las dependencias del frontend:
+   ```bash
+   cd cine-tunari
+   npm install
+   ```
+3. Inicia el servidor de desarrollo:
+   ```bash
+   npm start
+   ```
+4. Abre `http://localhost:4200`.
+
+Usuario de prueba: `demo@cinetunari.demo` / `demo1234`.
+
+## Configuración (`src/environments/environment.ts`)
+
+| Variable | Valor por defecto | Descripción |
+|---|---|---|
+| `apiUrl` | `http://127.0.0.1:3000/api` | URL base de la API |
+| `archivosUrl` | `http://127.0.0.1:3000` | Origen desde donde se sirven `/videos` y `/portadas` |
+
+> El backend solo acepta peticiones del origen configurado en su `CORS_ORIGIN`
+> (por defecto `http://localhost:4200`).
+
+## Estructura
+
+```
+src/app/
+  app.ts / app.html / app.config.ts   Raíz, footer y providers (router + HttpClient)
+  app.routes.ts                       Rutas: '', titulo/:id, login, register,
+                                      watch/:id (protegida), admin (protegida, carga diferida)
+  components/
+    header/                           Barra superior con sesión
+    title-card/                       Tarjeta 2:3 (iniciales si no hay portada)
+    carousel/                         Fila horizontal con flechas
+    accent-title/                     Título con la última palabra en cursiva dorada
+    chatbot/                          Asistente flotante (POST /api/chatbot)
+  core/
+    guards/auth.guard.ts              Exige sesión (reproductor y admin)
+    models/models.ts                  Interfaces de los datos de la API
+    services/api.ts                   ÚNICO servicio HTTP
+    services/session.ts               Token y usuario (localStorage)
+    services/auth.service.ts          Login, registro y cierre de sesión
+    services/content.ts               Textos de `sitio` y `secciones`, categorías y géneros
+    services/favorites.ts             Estado compartido de "Mi lista"
+  pages/
+    catalog/                          Inicio: hero, carruseles por categoría, búsqueda/filtros
+    title-detail/                     Ficha del título: banner, ficha técnica, episodios
+    admin/                            Administración (lista, formulario, episodios)
+    watch/                            Reproductor a pantalla completa
+    login/  register/                 Formularios de acceso
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Scripts
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Comando | Descripción |
+|---|---|
+| `npm start` | Servidor de desarrollo en `http://localhost:4200` |
+| `npm run build` | Compilación de producción en `dist/` |
+| `npm test` | Pruebas unitarias (Vitest) |

@@ -1,0 +1,148 @@
+@if (filtrando()) {
+  <!-- ===== Resultados: búsqueda, categoría o género ===== -->
+  <section class="results page container">
+    <header class="results__head reveal">
+      <span class="eyebrow">{{ content.sitio()?.nombre }}</span>
+      <h1><app-accent-title [texto]="tituloResultados()" /></h1>
+      @if (buscar()) {
+        <p class="muted">“{{ buscar() }}”</p>
+      } @else if (content.seccion(categoria()).subtitulo) {
+        <p class="muted">{{ content.seccion(categoria()).subtitulo }}</p>
+      }
+    </header>
+
+    <div class="filters reveal" style="--i: 1">
+      @for (c of content.categorias(); track c.id) {
+        <button type="button" class="chip" [class.chip--on]="categoria() === c.slug" [attr.aria-pressed]="categoria() === c.slug" (click)="filtro('categoria', c.slug)">
+          {{ content.seccion(c.slug).etiqueta || c.nombre }}
+        </button>
+      }
+      <select class="input filters__select" [value]="genero()" (change)="filtro('genero', $any($event.target).value)" aria-label="Género">
+        <option value="">Todos los géneros</option>
+        @for (g of content.generos(); track g.id) {
+          <option [value]="g.nombre">{{ g.nombre }}</option>
+        }
+      </select>
+      <a class="link" routerLink="/">Limpiar ✕</a>
+    </div>
+
+    @if (buscando()) {
+      <div class="grid">
+        @for (i of esqueletos; track i) {
+          <span class="skeleton grid__sk"></span>
+        }
+      </div>
+    } @else if (resultados().length === 0) {
+      <div class="empty reveal">
+        <span class="empty__mark">∅</span>
+        <h3>{{ content.seccion('vacio').titulo }}</h3>
+        <p>{{ content.seccion('vacio').subtitulo }}</p>
+      </div>
+    } @else {
+      <div class="grid">
+        @for (t of resultados(); track t.id; let i = $index) {
+          <app-title-card class="reveal" [style.--i]="i % 12" [enlace]="['/titulo', t.id]" [nombre]="t.titulo" [portada]="portada(t.portada)" [anio]="t.anio" [detalle]="t.categoria" />
+        }
+      </div>
+    }
+  </section>
+} @else {
+  <!-- ===== Portada (hero) ===== -->
+  @if (loading()) {
+    <section class="hero hero--loading" aria-busy="true">
+      <div class="hero__content container">
+        <span class="skeleton" style="width: 120px; height: 12px"></span>
+        <span class="skeleton" style="width: min(520px, 80%); height: 56px; margin-top: 1rem"></span>
+        <span class="skeleton" style="width: min(420px, 70%); height: 14px; margin-top: 1.25rem"></span>
+        <span class="skeleton" style="width: min(480px, 75%); height: 14px; margin-top: 0.6rem"></span>
+        <span class="skeleton" style="width: 300px; height: 46px; margin-top: 1.75rem"></span>
+      </div>
+    </section>
+  } @else if (hero(); as h) {
+    <section class="hero" [style.background-image]="fondoHero(h)">
+      <div class="hero__content container reveal">
+        <span class="eyebrow">{{ content.seccion('destacados').titulo }} · {{ h.categoria }}</span>
+        <h1 class="hero__title"><app-accent-title [texto]="h.titulo" /></h1>
+        <p class="hero__meta">
+          @if (h.anio) { <span>{{ h.anio }}</span> }
+          @if (h.duracion_min) { <span>{{ duracion(h.duracion_min) }}</span> }
+          @if (h.clasificacion) { <span class="hero__rating">{{ h.clasificacion }}</span> }
+          @if (h.generos) { <span>{{ h.generos }}</span> }
+        </p>
+        <p class="hero__synopsis">{{ h.sinopsis }}</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" [routerLink]="['/watch', h.id]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16l13-8z" /></svg> Ver ahora
+          </a>
+          <button type="button" class="btn btn--ghost" [class.btn--active]="favoritos.es(h.id)" [attr.aria-pressed]="favoritos.es(h.id)" (click)="miLista(h)">
+            {{ favoritos.es(h.id) ? '✓' : '+' }} {{ content.seccion('favoritos').etiqueta }}
+          </button>
+          <a class="link" [routerLink]="['/titulo', h.id]">Más información</a>
+        </div>
+      </div>
+    </section>
+  } @else {
+    <section class="intro page container reveal">
+      <span class="eyebrow">{{ content.sitio()?.eslogan }}</span>
+      <h1><app-accent-title [texto]="content.seccion('inicio').titulo" /></h1>
+      <p class="muted">{{ content.seccion('inicio').subtitulo }}</p>
+    </section>
+  }
+
+  <!-- ===== Filas ===== -->
+  <div class="rows" [class.rows--overlap]="!loading() && hero()">
+    @if (error()) {
+      <div class="container"><p class="alert alert--error">No se pudo cargar el catálogo: {{ error() }}</p></div>
+    }
+
+    @if (loading()) {
+      @for (r of [0, 1]; track r) {
+        <div class="container sk-row" aria-hidden="true">
+          <span class="skeleton" style="width: 200px; height: 24px"></span>
+          <div class="sk-row__track">
+            @for (i of esqueletos; track i) {
+              <span class="skeleton sk-row__card"></span>
+            }
+          </div>
+        </div>
+      }
+    } @else {
+      @if (continuar().length > 0) {
+        <app-carousel class="reveal" [titulo]="content.seccion('continuar').titulo" [subtitulo]="content.seccion('continuar').subtitulo">
+          @for (h of continuar(); track h.id) {
+            <app-title-card [enlace]="['/watch', h.titulo_id]" [query]="h.episodio_id ? { ep: h.episodio_id } : null" [nombre]="h.titulo" [portada]="portada(h.portada)" [detalle]="detalleHistorial(h)" [progreso]="progreso(h)" />
+          }
+        </app-carousel>
+      }
+
+      @if (favoritos.lista().length > 0) {
+        <app-carousel class="reveal" [titulo]="content.seccion('favoritos').titulo" [subtitulo]="content.seccion('favoritos').subtitulo">
+          @for (f of favoritos.lista(); track f.id) {
+            <app-title-card [enlace]="['/titulo', f.titulo_id]" [nombre]="f.titulo" [portada]="portada(f.portada)" [anio]="f.anio" [detalle]="f.categoria" />
+          }
+        </app-carousel>
+      }
+
+      @for (fila of filas(); track fila.categoria.id; let i = $index) {
+        <app-carousel
+          class="reveal"
+          [style.--i]="i + 1"
+          [titulo]="fila.seccion.titulo || fila.categoria.nombre"
+          [subtitulo]="fila.seccion.subtitulo"
+          [verTodo]="fila.items.length > 0 ? { categoria: fila.categoria.slug } : null"
+          [vacio]="fila.items.length === 0"
+        >
+          @for (t of fila.items; track t.id) {
+            <app-title-card [enlace]="['/titulo', t.id]" [nombre]="t.titulo" [portada]="portada(t.portada)" [anio]="t.anio" [detalle]="t.generos ?? ''" />
+          } @empty {
+            <div class="empty">
+              <span class="empty__mark">{{ fila.categoria.nombre.charAt(0) }}</span>
+              <h3>{{ content.seccion('vacio').titulo }}</h3>
+              <p>{{ content.seccion('vacio').subtitulo }}</p>
+            </div>
+          }
+        </app-carousel>
+      }
+    }
+  </div>
+}

@@ -1,0 +1,56 @@
+<header class="header" [class.header--solid]="solido() || menu()">
+  <a routerLink="/" class="header__brand display" [attr.aria-label]="content.sitio()?.nombre">
+    <app-accent-title [texto]="content.sitio()?.nombre ?? ''" />
+  </a>
+
+  <button
+    type="button"
+    class="header__burger"
+    [class.header__burger--open]="menu()"
+    (click)="alternarMenu()"
+    [attr.aria-expanded]="menu()"
+    aria-controls="menu-principal"
+    aria-label="Abrir menú"
+  >
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="header__menu" id="menu-principal" [class.header__menu--open]="menu()">
+    <nav class="header__nav" aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="activo">{{ content.seccion('inicio').etiqueta }}</a>
+      @for (c of content.categorias(); track c.id) {
+        <a routerLink="/" [queryParams]="{ categoria: c.slug }" routerLinkActive="is-active" [routerLinkActiveOptions]="activo">
+          {{ content.seccion(c.slug).etiqueta || c.nombre }}
+        </a>
+      }
+      @if (auth.user()) {
+        <a routerLink="/admin" routerLinkActive="is-active">{{ content.seccion('admin').etiqueta || 'Administrar' }}</a>
+      }
+    </nav>
+
+    <div class="header__tools">
+      <form class="header__search" role="search" (submit)="$event.preventDefault(); irABuscar()">
+        <label for="buscador" class="sr-only">{{ content.seccion('buscar').etiqueta }}</label>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+        <input
+          id="buscador"
+          type="search"
+          [value]="busqueda()"
+          (input)="onBuscar($any($event.target).value)"
+          [placeholder]="content.seccion('buscar').etiqueta"
+        />
+      </form>
+
+      @if (auth.user(); as user) {
+        <div class="header__user">
+          <span class="header__avatar" aria-hidden="true">{{ (user.nombre || user.email).charAt(0) }}</span>
+          <span class="header__name">{{ user.nombre || user.email }}</span>
+          <button type="button" class="link" (click)="logout()">Salir</button>
+        </div>
+      } @else {
+        <a routerLink="/login" class="link">{{ content.seccion('login').etiqueta }}</a>
+        <a routerLink="/register" class="btn btn--primary btn--sm">{{ content.seccion('registro').etiqueta }}</a>
+      }
+    </div>
+  </div>
+</header>

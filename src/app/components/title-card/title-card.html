@@ -1,0 +1,21 @@
+<a class="card" [routerLink]="enlace()" [queryParams]="query()" [attr.aria-label]="nombre() + (anio() ? ', ' + anio() : '')">
+  <div class="card__poster">
+    @if (mostrarImagen()) {
+      <img [src]="portada()" [alt]="'Portada de ' + nombre()" loading="lazy" (error)="imagenRota.set(true)" />
+    } @else {
+      <div class="card__placeholder" aria-hidden="true">
+        <span class="card__initials">{{ marca() }}</span>
+        <span class="card__ph-name">{{ nombre() }}</span>
+      </div>
+    }
+
+    <div class="card__info" aria-hidden="true">
+      <span class="card__title">{{ nombre() }}</span>
+      <span class="card__meta">{{ anio() }}@if (anio() && detalle()) { · }{{ detalle() }}</span>
+    </div>
+
+    @if (progreso() !== null) {
+      <span class="card__progress"><span [style.width.%]="(progreso() ?? 0) * 100"></span></span>
+    }
+  </div>
+</a>

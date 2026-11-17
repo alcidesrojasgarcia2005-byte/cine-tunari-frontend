@@ -1,0 +1,110 @@
+.row {
+  margin-bottom: clamp(1.75rem, 3vw, 2.75rem);
+
+  &__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+
+    h2 {
+      margin: 0;
+      font-size: var(--fs-h2);
+    }
+
+    p {
+      margin: 0.2rem 0 0;
+      color: var(--muted);
+      font-size: var(--fs-small);
+    }
+  }
+
+  &__viewport {
+    position: relative;
+
+    &:hover .row__arrow.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--card-w);
+    gap: clamp(0.6rem, 1.2vw, 1rem);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    /* espacio para que la tarjeta "se levante" sin cortarse */
+    padding: 1rem var(--gutter) 1.25rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+  }
+
+  &__track--empty {
+    display: block;
+  }
+
+  &__arrow {
+    position: absolute;
+    top: 1rem;
+    bottom: 1.25rem;
+    z-index: 2;
+    width: calc(var(--gutter) + 0.5rem);
+    min-width: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    color: var(--text);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur) var(--ease);
+
+    svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      transition: transform var(--dur) var(--ease);
+    }
+
+    &:hover {
+      color: var(--accent);
+
+      svg {
+        transform: scale(1.15);
+      }
+    }
+
+    &--left {
+      left: 0;
+      background: linear-gradient(90deg, var(--veil-strong), transparent);
+    }
+
+    &--right {
+      right: 0;
+      background: linear-gradient(270deg, var(--veil-strong), transparent);
+    }
+  }
+}
+
+/* En táctil se desliza con el dedo: sin flechas */
+@media (hover: none) {
+  .row__arrow {
+    display: none;
+  }
+}
+
+:host ::ng-deep .row__track > * {
+  scroll-snap-align: start;
+}

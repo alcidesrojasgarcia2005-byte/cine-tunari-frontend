@@ -1,0 +1,27 @@
+<section class="row">
+  <header class="row__head container">
+    <div>
+      <h2><app-accent-title [texto]="titulo()" /></h2>
+      @if (subtitulo()) {
+        <p>{{ subtitulo() }}</p>
+      }
+    </div>
+    @if (verTodo(); as q) {
+      <a class="link" routerLink="/" [queryParams]="q">{{ verTodoTexto() }} →</a>
+    }
+  </header>
+
+  <div class="row__viewport">
+    <button type="button" class="row__arrow row__arrow--left" [class.is-visible]="puedeIzq()" (click)="mover(-1)" tabindex="-1" aria-label="Anteriores">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" /></svg>
+    </button>
+
+    <div class="row__track" [class.row__track--empty]="vacio()" #pista (scroll)="medir()">
+      <ng-content />
+    </div>
+
+    <button type="button" class="row__arrow row__arrow--right" [class.is-visible]="puedeDer()" (click)="mover(1)" tabindex="-1" aria-label="Siguientes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+    </button>
+  </div>
+</section>
